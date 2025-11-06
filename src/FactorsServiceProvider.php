@@ -58,13 +58,6 @@ class FactorsServiceProvider extends ServiceProvider
         $this->app->singleton('factors', function () {
             return new Factors;
         });
-
-        // Register Filament resources
-        if (class_exists(\Filament\Facades\Filament::class)) {
-            \Filament\Facades\Filament::registerResources([
-                \Mortezaa97\Factors\Filament\Resources\FactorResource::class,
-            ]);
-        }
     }
 }
 
