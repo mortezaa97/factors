@@ -1,0 +1,79 @@
+name: Create Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write  # ✅ allow creating tags and releases
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for versioning
+
+      # Set up Git identity (required for tagging)
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Set up PHP environment
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+          coverage: none
+
+      # Install dependencies
+      - name: Install Composer dependencies
+        run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+
+      # Get latest tag
+      - name: Get latest tag
+        id: latest_tag
+        run: |
+          LATEST_TAG=$(git tag --sort=-v:refname | head -n 1 || echo "0.0.0")
+          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+
+      # Calculate next version (increment patch)
+      - name: Calculate next version
+        id: next_version
+        run: |
+          LATEST_TAG=${{ env.LATEST_TAG }}
+          if [ "$LATEST_TAG" = "0.0.0" ]; then
+            NEXT_VERSION="1.0.0"
+          else
+            IFS='.' read -r major minor patch <<< "${LATEST_TAG#v}"
+            NEXT_VERSION="$major.$minor.$((patch + 1))"
+          fi
+          echo "NEXT_VERSION=$NEXT_VERSION" >> $GITHUB_ENV
+
+      # Create and push the new tag
+      - name: Create new tag
+        run: |
+          git tag v${{ env.NEXT_VERSION }}
+          git push origin v${{ env.NEXT_VERSION }}
+
+      # Create GitHub Release
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ env.NEXT_VERSION }}
+          release_name: Release v${{ env.NEXT_VERSION }}
+          body: |
+            Automated release for version v${{ env.NEXT_VERSION }}
+            Changes in this release:
+            - See commit history for details
+          draft: false
+          prerelease: false

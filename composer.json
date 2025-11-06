@@ -1,0 +1,54 @@
+{
+    "name": "mortezaa97/factors",
+    "description": "",
+    "keywords": [
+        "mortezaa97",
+        "factors"
+    ],
+    "homepage": "https://github.com/mortezaa97/factors",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "mortezaa97",
+            "email": "mortezajafari76@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.4|^8.0",
+        "illuminate/support": "^8.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^6.0",
+        "phpunit/phpunit": "^9.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mortezaa97\\Factors\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mortezaa97\\Factors\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mortezaa97\\Factors\\FactorsServiceProvider"
+            ],
+            "aliases": {
+                "Factors": "Mortezaa97\\Factors\\FactorsFacade"
+            }
+        }
+    }
+}
