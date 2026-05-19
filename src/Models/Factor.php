@@ -93,5 +93,15 @@ class Factor extends Model
     {
         return $this->belongsTo(User::class, 'customer_id');
     }
+
+    public static function getValidTypes(): array
+    {
+        return array_map(function ($type) {
+            return [
+                'label' => self::VALID_TYPES[$type],
+                'value' => $type,
+            ];
+        }, array_keys(self::VALID_TYPES));
+    }
 }
 

@@ -155,6 +155,29 @@ $factor = Factor::with(['customer', 'items.model', 'createdBy', 'updatedBy'])
     ->find($id);
 ```
 
+## Inventory & Other Package Integrations
+
+The package now dispatches domain events whenever items change, so other packages (like `inventories`) can listen and react without hard coupling.
+
+| Event | Fired when | Payload |
+| --- | --- | --- |
+| `Mortezaa97\Factors\Events\FactorItemCreated` | A new factor item is stored | `FactorHasItem $item` |
+| `Mortezaa97\Factors\Events\FactorItemUpdated` | An existing item changes (count, product, etc.) | `FactorHasItem $item`, `array $originalAttributes` |
+| `Mortezaa97\Factors\Events\FactorItemDeleted` | An item is soft-deleted/removed | `FactorHasItem $item` |
+
+Listening is the same as any Laravel event:
+
+```php
+use Illuminate\Support\Facades\Event;
+use Mortezaa97\Factors\Events\FactorItemCreated;
+
+Event::listen(FactorItemCreated::class, function (FactorItemCreated $event) {
+    // $event->item is fully hydrated (with factor relation)
+});
+```
+
+These hooks keep the Factors package agnostic while allowing consumers to keep inventories, accounting, or analytics in sync.
+
 ## Customization
 
 ### Publishing Config
